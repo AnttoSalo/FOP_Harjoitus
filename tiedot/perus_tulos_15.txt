@@ -1,0 +1,5 @@
+Kuukausittaiset kulutukset (MWh):
+Kuukausi;Yö;Päivä;Yhteensä
+Jan;2.3;1.0;3.3
+Apr;0.0;1.9;1.9
+Aug;0.0;4.4;4.4

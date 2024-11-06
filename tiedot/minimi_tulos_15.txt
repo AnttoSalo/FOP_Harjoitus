@@ -1,0 +1,13 @@
+Analyysin tulokset 15 tunnilta ovat seuraavat:
+Sähkönkulutus koko vuonna oli yhteensä 9605.5 kWh.
+Keskimääräinen tuntikulutus oli 640.4 kWh.
+Suurimmillaan tuntikohtainen kulutus oli 1228.69 kWh, 08-08-2023 09:00.
+Pienimmillään tuntikohtainen kulutus oli 402.66 kWh, 12-08-2023 16:00.
+
+Päivittäinen sähkönkulutus kilowattitunteina:
+01-01-2023;2811
+02-01-2023;479
+08-04-2023;924
+14-04-2023;1017
+08-08-2023;3525
+12-08-2023;847
