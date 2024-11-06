@@ -10,24 +10,9 @@
 # tämän tehtävän ja vain yllä mainitut henkilöt sekä lähteet ovat
 # vaikuttaneet siihen yllä mainituilla tavoilla.
 ######################################################################
-# Tehtävä Harjaitustyö
+# Tehtävä Harjoitustyö
 
 import HTPerusKirjasto
-import time
-import calendar
-
-class SDATA:
-    paiva = None
-    kuukausi = None
-    vuosi = None
-    tunti = None
-    kWhPaiva = None
-    kWhYo = None
-class KKDATA:
-    kuukausi = None
-    kWhPaiva = None
-    kWhYo = None
-    kWhYhteensa = None 
 
 def valikko():
     print("Valitse haluamasi toiminto:")
@@ -36,59 +21,42 @@ def valikko():
     print("3) Kirjoita tiedosto")
     print("4) Analysoi viikonpäivittäiset tulokset")
     print("0) Lopeta")
-    valinta = int(input("Valintasi: "))
-    return valinta
+    Valinta = int(input("Valintasi: "))
+    return Valinta
 
-def find_kkdata(kkData, kuukausi):
-    for kkdata in kkData:
-        if kkdata.kuukausi == kuukausi:
-            return kkdata
-    return None
-
-def analysoi(tiedot):
-    sdatalista = []
-    sdatalista:list[SDATA] = HTPerusKirjasto.luoLista(tiedot, SDATA)
-    kkData = []
-    for alkio in sdatalista:
-        kk = alkio.kuukausi
-        olemassaoleva_data:KKDATA = HTPerusKirjasto.etsiListasta(kkData, kk)
-        if olemassaoleva_data is None:
-            uusi_kkdata = KKDATA()
-            uusi_kkdata.kuukausi = kk
-            uusi_kkdata.kWhPaiva = alkio.kWhPaiva
-            uusi_kkdata.kWhYo = alkio.kWhYo
-            uusi_kkdata.kWhYhteensa = alkio.kWhPaiva + alkio.kWhYo
-            kkData.append(uusi_kkdata)
-        else:
-            data = olemassaoleva_data
-            data.kWhPaiva += alkio.kWhPaiva
-            data.kWhYo += alkio.kWhYo
-            data.kWhYhteensa += alkio.kWhPaiva + alkio.kWhYo
-    return kkData
-
-def paaOhjelma():
-    tiedot = []
+def paaohjelma():
+    Tiedot = []
+    Kirjoitettavat_tiedot = []
+    Tila = ""
     while True:
-        valinta = valikko()
-        if valinta == 0: return
-        elif valinta == 1:
-            tiedosto = HTPerusKirjasto.kysyTiedosto()
-            tiedot = HTPerusKirjasto.lueListaan(tiedosto, tiedot)
-            print("Tiedostosta {} luettiin {} riviä".format(tiedosto, len(tiedot))) # -1 koska ensimmäinen rivi on otsikko
-            print(tiedot)
-        elif valinta == 2: 
-            tiedot = analysoi(tiedot)
-        elif valinta == 3: 
-            HTPerusKirjasto.kirjoitaLista(HTPerusKirjasto.kysyTiedosto(), tiedot)
-        elif valinta == 4: analysoiViikonpaivittain()
+        Valinta = valikko()
+        if Valinta == 0: 
+            return None
+
+        elif Valinta == 1:
+            Tiedosto = HTPerusKirjasto.kysyTiedosto()
+            Tiedot = HTPerusKirjasto.lueListaan(Tiedosto, Tiedot)
+            print("Tiedostosta {} luettiin {} riviä".format(Tiedosto, len(Tiedot))) # -1 koska ensimmäinen rivi on otsikko
+
+        elif Valinta == 2: 
+            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiKuukausiTiedot(Tiedot)
+            Tila = "kk"
+
+        elif Valinta == 3: 
+            if not Kirjoitettavat_tiedot:
+                print("Ei analysoitua dataa tallennettavaksi. Suorita ensin analyysi.")
+            if Tila == "kk":
+                HTPerusKirjasto.kirjoitaListaKk(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+            elif Tila == "vp":
+                HTPerusKirjasto.kirjoitaListaVp(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+
+        elif Valinta == 4:
+            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikonpaivittain(Tiedot)
+            Tila = "vp"
+
         else: print("Virheellinen valinta")
-    
-paaOhjelma()
-
-def analysoiViikonpaivittain():
-    print("Analysoi viikonpäivittäin")
     return None
-
-
+    
+paaohjelma()
 
 # eof

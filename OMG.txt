@@ -1,0 +1,8 @@
+Viikonpäivä;Kulutus (MWh)
+Maanantai;958.6
+Tiistai;986.4
+Keskiviikko;992.7
+Torstai;988.6
+Perjantai;943.9
+Lauantai;642.2
+Sunnuntai;633.8
