@@ -20,6 +20,9 @@ def valikko():
     print("2) Analysoi")
     print("3) Kirjoita tiedosto")
     print("4) Analysoi viikonpäivittäiset tulokset")
+    print("5) Lue ja yhdistä lämpötilatiedosto")
+    print("6) Kirjoita yhdistetty data tiedostoon")
+    print("7) Analysoi viikoittaiset tulokset")
     print("0) Lopeta")
     Valinta = int(input("Valintasi: "))
     return Valinta
@@ -27,6 +30,7 @@ def valikko():
 def paaohjelma():
     Tiedot = []
     Kirjoitettavat_tiedot = []
+    Sanakirja = {}
     Tila = ""
     while True:
         Valinta = valikko()
@@ -37,9 +41,10 @@ def paaohjelma():
             Tiedosto = HTPerusKirjasto.kysyTiedosto()
             Tiedot = HTPerusKirjasto.lueListaan(Tiedosto, Tiedot)
             print("Tiedostosta {} luettiin {} riviä".format(Tiedosto, len(Tiedot))) # -1 koska ensimmäinen rivi on otsikko
+            Sanakirja = HTPerusKirjasto.lueSanakirjaan(Tiedot)
 
         elif Valinta == 2: 
-            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiKuukausiTiedot(Tiedot)
+            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiKuukausiTiedot(Sanakirja)
             Tila = "kk"
 
         elif Valinta == 3: 
@@ -51,8 +56,19 @@ def paaohjelma():
                 HTPerusKirjasto.kirjoitaListaVp(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
 
         elif Valinta == 4:
-            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikonpaivittain(Tiedot)
+            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikonpaivittain(Sanakirja)
             Tila = "vp"
+        elif Valinta == 5:
+            Tiedosto = HTPerusKirjasto.kysyTiedosto()            
+            Kirjoitettavat_tiedot = HTPerusKirjasto.yhdistaLampotila(Sanakirja, Tiedosto)
+        elif Valinta == 6:
+            if not Kirjoitettavat_tiedot:
+                print("Ei analysoitua dataa tallennettavaksi. Suorita ensin analyysi.")
+            HTPerusKirjasto.kirjoitaYhdistettyData(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+        elif Valinta == 7:
+            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikoittain(Sanakirja)
+            print("Matriisianalyysi suoritettu.")
+            HTPerusKirjasto.kirjoitaMatriisi(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
 
         else: print("Virheellinen valinta")
     return None
