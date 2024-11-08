@@ -12,7 +12,7 @@
 ######################################################################
 # Tehtävä Harjoitustyö
 
-import HTPerusKirjasto
+import HTTavoiteKirjasto
 
 def valikko():
     print("Valitse haluamasi toiminto:")
@@ -30,45 +30,51 @@ def valikko():
 def paaohjelma():
     Tiedot = []
     Kirjoitettavat_tiedot = []
+    Lista = []
     Sanakirja = {}
     Tila = ""
+    LampatilaLadattu = False
     while True:
         Valinta = valikko()
         if Valinta == 0: 
             return None
 
         elif Valinta == 1:
-            Tiedosto = HTPerusKirjasto.kysyTiedosto()
-            Tiedot = HTPerusKirjasto.lueListaan(Tiedosto, Tiedot)
-            print("Tiedostosta {} luettiin {} riviä".format(Tiedosto, len(Tiedot))) # -1 koska ensimmäinen rivi on otsikko
-            Sanakirja = HTPerusKirjasto.lueSanakirjaan(Tiedot)
+            Tiedosto = HTTavoiteKirjasto.kysyTiedosto()
+            Lista = HTTavoiteKirjasto.lueListaan(Tiedosto, Tiedot)
+            print("Tiedostosta {} luettiin {} riviä".format(Tiedosto, len(Tiedot)))
+            Sanakirja = HTTavoiteKirjasto.lueSanakirjaan(Tiedot)
+
+            Kirjoitettavat_tiedot = []
+            Tila = ""
+            LampatilaLadattu = False
 
         elif Valinta == 2: 
-            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiKuukausiTiedot(Sanakirja)
+            Kirjoitettavat_tiedot = HTTavoiteKirjasto.analysoiKuukausiTiedot(Sanakirja)
             Tila = "kk"
 
         elif Valinta == 3: 
             if not Kirjoitettavat_tiedot:
                 print("Ei analysoitua dataa tallennettavaksi. Suorita ensin analyysi.")
             if Tila == "kk":
-                HTPerusKirjasto.kirjoitaListaKk(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+                HTTavoiteKirjasto.kirjoitaListaKk(HTTavoiteKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
             elif Tila == "vp":
-                HTPerusKirjasto.kirjoitaListaVp(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+                HTTavoiteKirjasto.kirjoitaListaVp(HTTavoiteKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
 
         elif Valinta == 4:
-            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikonpaivittain(Sanakirja)
+            Kirjoitettavat_tiedot = HTTavoiteKirjasto.analysoiViikonpaivittain(Sanakirja)
             Tila = "vp"
         elif Valinta == 5:
-            Tiedosto = HTPerusKirjasto.kysyTiedosto()            
-            Kirjoitettavat_tiedot = HTPerusKirjasto.yhdistaLampotila(Sanakirja, Tiedosto)
+            Tiedosto = HTTavoiteKirjasto.kysyTiedosto()            
+            Kirjoitettavat_tiedot = HTTavoiteKirjasto.yhdistaLampotila(Sanakirja, Tiedosto)
         elif Valinta == 6:
             if not Kirjoitettavat_tiedot:
                 print("Ei analysoitua dataa tallennettavaksi. Suorita ensin analyysi.")
-            HTPerusKirjasto.kirjoitaYhdistettyData(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+            HTTavoiteKirjasto.kirjoitaYhdistettyData(HTTavoiteKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
         elif Valinta == 7:
-            Kirjoitettavat_tiedot = HTPerusKirjasto.analysoiViikoittain(Sanakirja)
+            Kirjoitettavat_tiedot = HTTavoiteKirjasto.analysoiViikoittain(Lista)
             print("Matriisianalyysi suoritettu.")
-            HTPerusKirjasto.kirjoitaMatriisi(HTPerusKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
+            HTTavoiteKirjasto.kirjoitaMatriisi(HTTavoiteKirjasto.kysyTiedosto(), Kirjoitettavat_tiedot)
 
         else: print("Virheellinen valinta")
     return None

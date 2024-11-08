@@ -14,7 +14,7 @@
 
 import time
 import sys
-import calendar
+import numpy
 
 class SDATA:
     Pvm = None
@@ -27,6 +27,7 @@ class KKDATA:
     MWhPaiva = None
     MWhYo = None
     MWhYhteensa = None 
+
 class VPDATA:
     Viikonpaiva = None
     MWhYhteensa = None
@@ -36,7 +37,7 @@ def kirjoitaListaKk(Nimi, Tiedot:list[KKDATA]):
         Tiedosto = open(Nimi, "w")
         Tiedosto.write("Kuukausittaiset kulutukset (MWh):\nKuukausi;Yö;Päivä;Yhteensä\n")
         for olio in Tiedot:
-            Tiedosto.write("{};{:.1f};{:.1f};{:.1f}\n".format(olio.Kuukausi,olio.MWhPaiva,olio.MWhYo,olio.MWhYhteensa))
+            Tiedosto.write("{};{:.1f};{:.1f};{:.1f}\n".format(olio.Kuukausi,olio.MWhYo,olio.MWhPaiva,olio.MWhYhteensa))
         Tiedosto.close()
     except OSError:
         print("Tiedoston '{}' käsittelyssä virhe, lopetetaan.".format(Nimi))
@@ -78,17 +79,18 @@ def lueSanakirjaan(Rivit):
         osat = Rivi.strip().split(";")
         Pvm = osat[0]
         PvmObj = time.strptime(Pvm, "%d-%m-%Y %H:%M")
-        PvmStr = time.strftime("%d-%m-%Y", PvmObj)
-        if PvmStr not in Sanakirja:
+        Pvm = time.strftime("%d-%m-%Y %H:%M", PvmObj)
+        Avain = time.strftime("%d-%m-%Y", PvmObj)
+        if Avain not in Sanakirja:
             Sdata = SDATA()
             Sdata.Pvm = Pvm
-            Sdata.kWhPaiva = float(osat[2])
             Sdata.kWhYo = float(osat[1])
-            Sanakirja[PvmStr] = Sdata
+            Sdata.kWhPaiva = float(osat[2])
+            Sanakirja[Avain] = Sdata
         else:
-            Sdata = Sanakirja[PvmStr]
-            Sdata.kWhPaiva += float(osat[2])
+            Sdata = Sanakirja[Avain]
             Sdata.kWhYo += float(osat[1])
+            Sdata.kWhPaiva += float(osat[2])
     return Sanakirja
 
 
@@ -110,7 +112,7 @@ def analysoiKuukausiTiedot(tiedot):
     kkData = {}
     # Process SDATA objects and calculate monthly consumption
     for pvm_str, alkio in tiedot.items():
-        pvm = time.strptime(pvm_str, "%d-%m-%Y %H:%M")
+        pvm = time.strptime(pvm_str, "%d-%m-%Y")
         kk = pvm.tm_mon
 
         if kk not in kkData:
@@ -187,23 +189,22 @@ def kirjoitaYhdistettyData(Nimi, Tiedot):
         sys.exit(0)
     return None
 
-def analysoiViikoittain(tiedot:dict[SDATA]):
-    # Initialize the matrix with all 53 weeks
-    #Lähde: Stackoverflow
-    matriisi = [[0, 0, 0] for _ in range(54)]
+def analysoiViikoittain(Tiedot):
+    # Initialize the NumPy matrix with zeros
+    matriisi = numpy.zeros((54, 3))
 
     # Process the input data
-    for tieto in tiedot.values():
-        pvm = time.strptime(tieto.Pvm, "%d-%m-%Y %H:%M")
+    for Rivi in Tiedot:
+        Rivi = Rivi.split(";")
+        pvm = time.strptime(Rivi[0], "%d-%m-%Y %H:%M")
         viikko = int(time.strftime("%W", pvm))
         if pvm.tm_hour < 8:
-            i = 0
+            i = 0  # Klo 0-8
         elif pvm.tm_hour < 16:
-            i = 1
-        elif pvm.tm_hour < 24:
-            i = 2
-        matriisi[viikko][i] += tieto.kWhPaiva + tieto.kWhYo
-
+            i = 1  # Klo 8-16
+        else:
+            i = 2  # Klo 16-24
+        matriisi[viikko][i] += (float(Rivi[1]) + float(Rivi[2]))
     return matriisi
 
 def viikkoSumma(Viikko):
@@ -212,12 +213,25 @@ def viikkoSumma(Viikko):
         sum += i
     return sum
 
+def matriisiSumma(Matriisi):
+    summa1 = 0
+    summa2 = 0
+    summa3 = 0
+    for Viikko in Matriisi:
+        summa1 += Viikko[0]
+        summa2 += Viikko[1]
+        summa3 += Viikko[2]
+    kokonaisSumma = summa1 + summa2 + summa3
+    return "{:.1f};{:.1f};{:.1f};{:.1f}\n".format(summa1/1000, summa2/1000, summa3/1000,kokonaisSumma/1000)
+
+
 def kirjoitaMatriisi(Tiedosto, Tiedot):
     try:
         Tiedosto = open(Tiedosto, "w")
         Tiedosto.write("Viikko;Klo 0-8;Klo 8-16;Klo 16-24;Viikkosumma\n")
         for index, Viikko in enumerate(Tiedot):
             Tiedosto.write("Vko {};{:.1f};{:.1f};{:.1f};{:.1f}\n".format(index, Viikko[0]/1000, Viikko[1]/1000, Viikko[2]/1000, viikkoSumma(Viikko)/1000))
+        Tiedosto.write("Yhteensä;{}".format(matriisiSumma(Tiedot)))
         Tiedosto.close()
     except OSError:
         print("Tiedoston '{}' käsittelyssä virhe, lopetetaan.".format(Tiedosto))
